@@ -3,8 +3,12 @@ defmodule GradingSystem.Application.ExamService do
   alias GradingSystem.Domain.Choice
   alias GradingSystem.Domain.Question
 
-  def create(teacher, title, is_template, date, questions) do
-    %Exam{title: title, is_template: is_template, date: date, teacher: teacher}
+  def create(teacher, title, date, questions) do
+    %Exam{title: title, is_template: false, date: date, teacher: teacher}
+  end
+
+  def create_template(teacher, title, date, questions) do
+    %Exam{title: title, is_template: true, date: date, teacher: teacher}
   end
 
   def create_question(statement, is_multiple, choices, correct_choice) do

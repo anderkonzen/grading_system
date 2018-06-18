@@ -20,10 +20,10 @@ choice1 = ExamService.create_choice("Opcao 1")
 choice2 = ExamService.create_choice("Opcao 2")
 question1 = ExamService.create_question("Qual opcao correta?", true, [choice1, choice2], choice2)
 question2 = ExamService.create_question("Escreva uma historia", false, [], nil)
-exam = ExamService.create(teacher, "Prova Biologia", false, ~D[2018-05-01], [question1, question2])
+template = ExamService.create_template(teacher, "Prova Biologia", ~D[2018-05-01], [question1, question2])
 
 # Professor aplicou prova para turma
-# para cada aluno:
+# - para cada aluno:
 evaluation = EvaluationService.apply_exam(exam, ~D[2018-05-01], ~D[2018-05-01], student) 
 
 # Professor compartilhou a prova para outros professores da mesma escola
@@ -35,26 +35,31 @@ A partir daqui apenas esboço de utilização da API
 ############
 
 # Professor editou modelo de prova
-exam = ExamService.update(exam, %{name: "Template prova Bio 2"})
-choice1 = ExamService.update_choice(choice1, %{statement: "nova escolha"})
+# - dado que temos a estrutura da prova/questoes/respostas
+exam_template = ExamService.update(exam_template, %{name: "Template prova Bio 2"})
+question1 = Exam.update_question(exam_template, question1, %{statement: "Novo enunciado"})
+choice1 = ExamService.update_choice(question1, choice1, %{statement: "nova escolha"})
 
 # Professor criou prova a partir do template
-exam2 = ExamService.create_from_template(exam)
+exam2 = ExamService.create_from_template(exam_template)
 
 # Professor criou nova versão de prova com base em uma outra
 exam3 = ExamService.create_from_exam(exam)
 
 # Aluno respondeu prova
-questions = StudentService.get_questions(exam)
-# para cada question:
+# - dado que encontramos uma evaluation em aberto (pelas datas), podemos buscar o exame e suas perguntas. Para cada pergunta o aluno:
+# Discursiva
 answer1 = StudentService.answer_question(question1, "a historia que deveria ser contada", nil)
+# Multipla escolha
 answer2 = StudentService.answer_question(question2, "", 1)
 
 # Professor corrigiu prova do aluno
-answer = EvaluationService.mark_corrected(exam, student)
+evaluation = EvaluationService.mark_corrected(exam, student)
+# ou dado que temos a evaluation em questao
+evaluation = EvaluationService.mark_corrected(evaluation)
 
 # Professor colocou comentário em prova corrigida
-evaluation = EvaluationService.add_comment(exam, student, "comentário do profe")
+evaluation = EvaluationService.add_comment(exam, evalution, student, "comentário do profe")
 
 # Professor adicionou nota individual em cada questao
 answer = AnswerService.mark(answer, mark)
